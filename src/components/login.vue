@@ -49,8 +49,27 @@
               // the successful code
               console.log(this.form)
                 this.axios({url:'/user/login', method:"post",data:this.form}) .then((res)=>{ 
-                    this.$router.push("/hello"); 
-                     
+                   // this.$router.push("/hello"); 
+                   var json = res.data;  
+                   console.log(json); 
+                    if (json == null || json.length == 0){
+                          this.alert('用户名 密码 不存在或错误!', '登录失败!');
+                        }
+                        else {
+                          this.$store.dispatch("setUser", true);
+                          //Vuex在用户刷新的时候userLogin会回到默认值false，所以我们需要用到HTML5储存
+                          //我们设置一个名为Flag，值为isLogin的字段，作用是如果Flag有值且为isLogin的时候，证明用户已经登录了。
+
+                          //localStorage.setItem("Flag", "isLogin");
+                          sessionStorage.setItem("Flag", "isLogin");
+
+                          sessionStorage.setItem("name", json.username);
+                          sessionStorage.setItem("useID", json.id);
+
+                          
+                          //登录成功后跳转到指定页面
+                          this.$router.replace({path: '/home'});
+                        }
                 }) .catch((res)=>{ 
                      console.log(res); 
                 });
