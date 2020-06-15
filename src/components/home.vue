@@ -1,6 +1,5 @@
 <template>
- <div id="product-list-one">
-    <el-container>
+<el-container>
       <el-header class="my-el-header">
         <div class="home_title" >XXX企业人事管理系统</div>
         <div class="home_userinfoContainer" >
@@ -18,8 +17,8 @@
 
       <el-container>
         <el-aside width="300px">
-           <el-menu :default-openeds="['']">
- 
+           <el-menu class="el-menu-vertical-demo"  default-active="0" router  @select="addTab" >
+<!--  
               <el-menu-item index="1"><i class="el-icon-user-solid"></i>员工管理</el-menu-item>
               <el-menu-item index="2"><i class="el-icon-message"></i>考勤管理</el-menu-item>
               <el-menu-item index="3"><i class="el-icon-star-on"></i>奖罚管理</el-menu-item>
@@ -27,21 +26,61 @@
               <el-submenu index="4">
                 <template slot="title"><i class="el-icon-setting"></i>系统管理</template>
                 <el-menu-item-group title=" ">
-                  <el-menu-item index="1-1">用户权限管理</el-menu-item>
-                  <el-menu-item index="1-2">菜单管理</el-menu-item>
+                   <el-menu-item index="1-1">部门管理</el-menu-item>
+                  <el-menu-item index="1-2">用户权限管理</el-menu-item>
+                  <el-menu-item index="1-3">菜单管理</el-menu-item>
                 </el-menu-item-group>
 
-              </el-submenu>
+              </el-submenu> -->
+               <template v-for="(item, index) in $router.options.routes" v-if="!item.hidden">
+                      <!--二级菜单-->
+                      <template v-if="!item.leaf" >
+                          <el-submenu :index="index+''">
+                            <template slot="title">
+                              <i :class="item.iconCls"></i>
+                              <span>{{item.name}}</span>
+                            </template>
+                            <el-menu-item-group>
+                              <el-menu-item :index="child.path" :key="index" v-for="(child, index) in item.children">
+                                {{child.name}}
+                              </el-menu-item>
+                            </el-menu-item-group>
+                        </el-submenu>
+                      </template>
+
+                      <!--一级菜单-->
+                      <template v-else>
+                          <el-menu-item :index="child.path" :key="child.path" v-for="(child, index) in item.children">
+                            <i :class="child.iconCls"></i>
+                            <span slot="title">{{child.name}}</span>
+                          </el-menu-item>
+                      </template>
+                      <!-- <subMenu v-else :data="item" :key="key"></subMenu> -->
+                  </template>
+
           </el-menu>
         </el-aside>
-        <el-main>Main</el-main>
-      </el-container>
 
-      <el-footer>Footer</el-footer>
+      <el-container>
+          <div class="gao-el-main">
+                <el-tabs v-model="editableTabsValue" type="border-card" closable  @edit="handleTabsEdit" @tab-click="showContent">
+                  <el-tab-pane
+                    :key="item.name"
+                    v-for="(item, index) in editableTabs"
+                    :label="item.title"
+                    :name="item.name"
+                    :route="item.route"
+                  >
+                    <router-view />
+                  </el-tab-pane>
+                </el-tabs>
+          </div>
+        </el-container>
     </el-container>
 
-   
- </div>
+      <el-footer class="myfooter">Footer</el-footer>
+</el-container>
+
      
 </template>
 
@@ -53,6 +92,9 @@
     data () {  
       return {
         username:'',
+        editableTabsValue: '2',
+        editableTabs: [],
+        tabIndex: 2,
     
       }
     },
@@ -79,14 +121,70 @@
                 });
           }
         },
+          findCompontByPath(path) {
+        for (let r of this.$router.options.routes) {
+          if (r.children) {
+            let a = r.children.find(c => c.path == path);
+            if (a) {
+              return a;
+            }
+          }
+        }
+        return null;
+      },
+      addTab(index) {
+        if (index) {
+          let componet = this.findCompontByPath(index);
+          // console.log(componet);
+          if (componet) {
+            if (!this.editableTabs.some(t => t.name == componet.path)) {
+              this.editableTabs.push({
+                title: componet.name,
+                name: componet.path,
+                route: componet.path
+              });
+            }
+            this.editableTabsValue = componet.path;
+            this.$router.push(componet.path);
+          }
+        }
+      },
+      handleTabsEdit(targetName, action) {
+        if (action === 'remove') {
+          let tabs = this.editableTabs;
+          let activeName = this.editableTabsValue;
+          if (activeName === targetName) {
+            tabs.forEach((tab, index) => {
+              // console.log(tab.name, targetName, tab.name === targetName);
+              if (tab.name === targetName) {
+                let nextTab = tabs[index + 1] || tabs[index - 1];
+                if (nextTab) {
+                  activeName = nextTab.name;
+                }
+              }
+            });
+          }
+          this.editableTabsValue = activeName;
+          this.editableTabs = tabs.filter(tab => tab.name !== targetName);
+          this.$router.push(activeName);
+        }
+      },
+    showContent(tag) {
+        this.$router.push(tag.name);
+      },
     },
   mounted: function () {
-        this.username=sessionStorage.getItem("name")
-      }
+        this.username=sessionStorage.getItem("name");
+
+
+      },
+
+
   }
 </script>
 
 <style>
+html,body{width: 100%;height: 100%; margin: 0;}
   .el-dropdown-link {
     cursor: pointer;
     color: #409EFF;
@@ -145,8 +243,18 @@
     margin-right: 20px;
     text-align: right;
   }
+  .gao-el-main {
+    background-color: #fff;
+    color: #000;
+    text-align: left;
+    width: 100%;
+    height:100%;
+  }
+  .myfooter{
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+  }
 
 </style>
-<style scoped>
 
-</style>
