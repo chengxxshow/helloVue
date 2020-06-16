@@ -5,7 +5,7 @@ import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
 import login from '@/components/login'
 import home from '@/components/home'
-import User from '@/components/User'
+import Emp from '@/components/Emp'
 import Dept from '@/components/Dept'
 import A from '@/components/A'
 import B from '@/components/B'
@@ -52,9 +52,9 @@ export default new Router({
       leaf: true,//只有一个节点
       children: [
         {
-          path: '/User',
+          path: '/Emp',
           name: '员工管理',
-          component: User,
+          component: Emp,
           iconCls: 'el-icon-user-solid',
           meta: {
             keepAlive: false,
