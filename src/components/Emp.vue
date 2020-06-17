@@ -598,7 +598,7 @@
            
             this.axios({url:'/emp/updateById', method:"post",data:this.formAdd}) .then((resp)=>{
               if (resp.status == 200) {
-                  this.dialogFormVisible=false;
+                  this.dialogFormVisible2=false;
                   this.$message({type:'success', message: resp.data});
                   this.refresh();
               }
@@ -633,11 +633,7 @@
         var _this = this;
         this.loading = true;
         this.axios('/emp/delById'+ids) .then((resp)=>{
-          var json = resp.data;
-          _this.$message({
-            type: json.status,
-            message: json.msg
-          });
+            this.$message({type:'success', message: resp.data});
           _this.refresh();
         }, resp=> {
           _this.loading = false;
