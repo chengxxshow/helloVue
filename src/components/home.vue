@@ -16,7 +16,7 @@
       </el-header>
 
       <el-container>
-        <el-aside width="300px">
+        <el-aside width="260px">
            <el-menu class="el-menu-vertical-demo"  default-active="0" router  @select="addTab" >
 <!--  
               <el-menu-item index="1"><i class="el-icon-user-solid"></i>员工管理</el-menu-item>

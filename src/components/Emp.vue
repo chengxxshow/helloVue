@@ -7,17 +7,21 @@
   </el-header>
     <el-main class="cate_mana_main gao_el-main">
       <el-table stripe class='tableBox'
+        ref="multipleTable"
         :data="tableData"
+        tooltip-effect="dark"
         style="width: 100%"
         @selection-change="handleSelectionChange" v-loading="loading">
+       
         <el-table-column
           type="selection"
-          width="55" align="left" v-if='false' >
+          width="55" align="left">
+        </el-table-column>
         </el-table-column>
         <el-table-column
           label="员工编号"
           prop="empno"
-          width="120" align="left">
+          width="100" align="left">
         </el-table-column>
         
        <el-table-column
@@ -29,7 +33,7 @@
          <el-table-column
           label="性别"
           prop="gender"
-          width="120" align="left" :formatter="showGender">
+          width="100" align="left" :formatter="showGender">
         </el-table-column>
 
         <el-table-column
@@ -61,12 +65,12 @@
           <template slot-scope="scope">
             <el-button type="primary"
               size="mini"
-              @click="">编辑
+              @click="handleEdit(scope.$index, scope.row)">编辑
             </el-button>
             <el-button
               size="mini"
               type="danger"
-              @click="">删除
+              @click="handleDelete(scope.$index, scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
@@ -264,6 +268,196 @@
            
       </el-dialog>
 <!-- 新建员工弹框---end -->
+<!-- 修改员工弹框---start -->
+        <el-dialog title="修改员工信息" :visible.sync="dialogFormVisible2" width="600px" align="center">
+            <el-form  ref="formAdd" :rules="rules"  :inline="true" :model="formAdd" class="demo-form-inline" size="mini">
+                
+               <el-row :gutter="2">
+                    <el-col :span="4">
+                    <div class="grid-content bg-purple">
+                        <font style="font-size:13px;font-family:'Microsoft YaHei'">员工编号:</font>&nbsp;
+                    </div>
+                    </el-col>
+
+                    <el-col :span="7">
+                    <div class="grid-content bg-purple">
+                       <el-form-item label="" prop="empno">
+                          <el-input v-model="formAdd.empno" placeholder="员工编号" size="mini"></el-input>
+                       </el-form-item>
+                    </div>
+                    </el-col>
+
+                    <el-col :span="4">
+                    <div class="grid-content bg-purple">
+                        <font style="font-size:13px;font-family:'Microsoft YaHei'">员工名:</font>&nbsp;
+                    </div>
+                    </el-col>
+
+                    <el-col :span="7">
+                    <div class="grid-content bg-purple">
+                         <el-form-item label="" prop="ename">
+                            <el-input v-model="formAdd.ename" placeholder="员工名" size="mini"></el-input>
+                        </el-form-item>
+                    </div>
+                    </el-col>
+                </el-row>
+
+                <el-row :gutter="2">
+                    <el-col :span="4">
+                    <div class="grid-content bg-purple">
+                        <font style="font-size:13px;font-family:'Microsoft YaHei'">性别:</font>&nbsp;
+                    </div>
+                    </el-col>
+
+                    <el-col :span="7">
+                    <div class="grid-content bg-purple">
+                       <el-form-item label=""  prop="gender">
+                           <el-radio v-model="formAdd.gender" :label="1">男</el-radio>
+                           <el-radio v-model="formAdd.gender" :label="0">女</el-radio>
+                       </el-form-item>
+                    </div>
+                    </el-col>
+
+                    <el-col :span="4">
+                     
+                    <div class="grid-content bg-purple">
+                        <font style="font-size:13px;font-family:'Microsoft YaHei'">出生日期:</font>&nbsp;
+                    </div>
+                    </el-col>
+
+                    <el-col :span="7">
+                      <div class="grid-content bg-purple">
+                          <el-form-item label="" prop="birthday">
+                              <el-date-picker   type="date" placeholder="选择日期" size="mini" style="width: 130px;" 
+                                  v-model="formAdd.birthday" value-format="yyyy-MM-dd" :picker-options="pickerOptions">
+                              </el-date-picker>
+                            </el-form-item>
+                      </div>
+                    </el-col>
+                </el-row>
+
+                <el-row :gutter="2">
+                    <el-col :span="4">
+                    <div class="grid-content bg-purple">
+                        <font style="font-size:13px;font-family:'Microsoft YaHei'">学历:</font>&nbsp;
+                    </div>
+                    </el-col>
+
+                    <el-col :span="7">
+                    <div class="grid-content bg-purple">
+                       <el-form-item label="" prop="eduback">
+                            <el-select  placeholder="学历" 
+                               size="mini" v-model="formAdd.eduback">
+                              
+                               <el-option label="本科" value="1"></el-option>
+                               <el-option label="硕士" value="2"></el-option>
+                               <el-option label="博士" value="3"></el-option
+                               <el-option label="其它" value="4"></el-option>
+                              </el-select>
+                       </el-form-item>
+                    </div>
+                    </el-col>
+
+                    <el-col :span="4">
+                    <div class="grid-content bg-purple">
+                        <font style="font-size:13px;font-family:'Microsoft YaHei'">入职时间:</font>&nbsp;
+                    </div>
+                    </el-col>
+
+                    <el-col :span="7">
+                      <div class="grid-content bg-purple">
+                           <el-form-item label="" prop="hiredate" >
+                              <el-date-picker  type="date" placeholder="选择日期" size="mini" style="width: 130px;" 
+                              v-model="formAdd.hiredate" value-format="yyyy-MM-dd">
+                              </el-date-picker>
+                            </el-form-item>
+                      </div>
+                    </el-col>
+                </el-row>
+              <el-row :gutter="2">
+                    <el-col :span="4">
+                    <div class="grid-content bg-purple">
+                        <font style="font-size:13px;font-family:'Microsoft YaHei'">所在部门:</font>&nbsp;
+                    </div>
+                    </el-col>
+
+                    <el-col :span="7">
+                      <div class="grid-content bg-purple">
+                          <el-form-item label="" prop='deptno'>
+                                <el-select  placeholder="所在部门" 
+                                size="mini" v-model="formAdd.deptno">
+                                    <el-option
+                                        v-for="item in deptList"
+                                        :key="item.deptno"
+                                        :label="item.deptname"
+                                        :value="item.deptno">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                      </div>
+                    </el-col>
+                  <el-col :span="4">
+                    <div class="grid-content bg-purple">
+                        <font style="font-size:13px;font-family:'Microsoft YaHei'">职位名称:</font>&nbsp;
+                    </div>
+                    </el-col>
+
+                    <el-col :span="7">
+                    <div class="grid-content bg-purple">
+                       <el-form-item label="" prop="job">
+                           <el-input v-model="formAdd.job" placeholder="职位名称" size="mini"></el-input>
+                       </el-form-item>
+                    </div>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="2">
+                    <el-col :span="4">
+                    <div class="grid-content bg-purple">
+                        <font style="font-size:13px;font-family:'Microsoft YaHei'">入职状态:</font>&nbsp;
+                    </div>
+                    </el-col>
+
+                    <el-col :span="7">
+                      <div class="grid-content bg-purple">
+                          <el-form-item label="" prop="status">
+                              <el-select  placeholder="入职状态" size="mini" v-model="formAdd.status">
+                                
+                                <el-option label="在职" :value="1"></el-option>
+                                <el-option label="停职" :value="2"></el-option>
+                                <el-option label="离职" :value="0"></el-option>
+                                
+                              </el-select>
+                          </el-form-item>
+
+                      </div>
+                    </el-col>
+                        <el-col :span="4">
+                    <div class="grid-content bg-purple">
+                        <font style="font-size:13px;font-family:'Microsoft YaHei'">备注:</font>&nbsp;
+                    </div>
+                    </el-col>
+
+                    <el-col :span="7">
+                    <div class="grid-content bg-purple">
+                       <el-form-item label="" prop="notes">
+                           <el-input type="textarea" v-model="formAdd.notes"  :rows="2" placeholder="其他信息" >
+                          </el-input>
+                       </el-form-item>
+                    </div>
+                    </el-col>
+                </el-row>
+                <br/>
+                  <el-form-item>
+                    <el-input type="hidden"  v-model="formAdd.id"  />
+                    <el-button type="warning" @click="dialogFormVisible2 = false" size="mini">取 消</el-button>
+                    <el-button type="primary" @click="updateEmp('formAdd')" size="mini">保 存</el-button>
+                  </el-form-item>
+            </el-form>
+            
+            <br>
+           
+      </el-dialog>
+<!-- 修改员工弹框---end -->
 </el-container>
 </template>
 
@@ -334,14 +528,14 @@
     newEmp(){
         let _this = this;
         _this.dialogFormVisible = true;
-        _this.emono='',
-        _this.ename='',
-        _this.birthday='',
-        _this.gender='1',
-        _this.eduback='',
-        _this.deptno='',
-        _this.status='1',
-        _this.notes=''
+        _this.formAdd.emono='',
+        _this.formAdd.ename='',
+        _this.formAdd.birthday='',
+        _this.formAdd.gender='1',
+        _this.formAdd.eduback='',
+        _this.formAdd.deptno='',
+        _this.formAdd.status='1',
+        _this.formAdd.notes=''
       },
     getNowTime() {
 	       var now = new Date();
@@ -380,8 +574,89 @@
          }
       })
     },
+   //打开编辑员工模态框,并初始化值
+    handleEdit(index, row){
+        var _this = this;
+        _this.dialogFormVisible2 = true;
+        console.log("row"+row.id);
+        _this.formAdd.empno=row.empno;
+        _this.formAdd.ename=row.ename;
+        _this.formAdd.birthday=row.birthday;
+        _this.formAdd.gender=row.gender;
+        _this.formAdd.eduback=row.eduback;
+        _this.formAdd.deptno=row.deptno;
+        _this.formAdd.job=row.job;
+        _this.formAdd.status=row.status;
+        _this.formAdd.notes=row.notes;
+        _this.formAdd.id=row.id;
 
+      },
+    //保存修改员工信息
+    updateEmp(formName){
+       this.$refs[formName].validate(valid => {
+         if (valid) {
+           
+            this.axios({url:'/emp/updateById', method:"post",data:this.formAdd}) .then((resp)=>{
+              if (resp.status == 200) {
+                  this.dialogFormVisible=false;
+                  this.$message({type:'success', message: resp.data});
+                  this.refresh();
+              }
+            },resp=> {
+            if (resp.response.status == 403) {
+              this.$message({
+                type: 'error',
+                message: resp.response.data
+              });
+            }
+            this.loading = false;
+          }) 
+         }
+      })
     },
+    //删除选中记录
+    handleDelete(index, row){
+        let _this = this;
+        this.$confirm('确认删除 "' + row.ename + '" ?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          _this.deleteCate(row.id);
+        }).catch(() => {
+          //取消
+          _this.loading = false;
+        });
+      },
+      //删除一条或多条信息
+       deleteCate(ids){
+        var _this = this;
+        this.loading = true;
+        this.axios('/emp/delById'+ids) .then((resp)=>{
+          var json = resp.data;
+          _this.$message({
+            type: json.status,
+            message: json.msg
+          });
+          _this.refresh();
+        }, resp=> {
+          _this.loading = false;
+          if (resp.response.status == 403) {
+            _this.$message({
+              type: 'error',
+              message: resp.response.data
+            });
+          } else if (resp.response.status == 500) {
+            _this.$message({
+              type: 'error',
+              message: '删除失败!'
+            });
+          }
+        })
+      },
+    },
+   
+
     mounted: function () {
       this.loading = true;
       this.refresh();
@@ -398,18 +673,19 @@
         loading: false,
 
         dialogFormVisible: false,
-
+        dialogFormVisible2: false,
+        rowId:'',
        
    
        formAdd:{
           empno:'',
           ename:'',
-          gender:'1',
+          gender:'',
           birthday:'',
           hiredate:this.getNowTime(),
           eduback:'',
           deptno:'',
-          status:'1',
+          status:'',
           job:'',
           notes:'',
        } ,
