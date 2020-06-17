@@ -595,7 +595,7 @@
     updateEmp(formName){
        this.$refs[formName].validate(valid => {
          if (valid) {
-           
+           console.log(this.formAdd)
             this.axios({url:'/emp/updateById', method:"post",data:this.formAdd}) .then((resp)=>{
               if (resp.status == 200) {
                   this.dialogFormVisible2=false;
@@ -632,7 +632,7 @@
        deleteCate(ids){
         var _this = this;
         this.loading = true;
-        this.axios('/emp/delById'+ids) .then((resp)=>{
+        this.axios.delete('/emp/delById?ids='+ids) .then((resp)=>{
             this.$message({type:'success', message: resp.data});
           _this.refresh();
         }, resp=> {
