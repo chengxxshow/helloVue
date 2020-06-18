@@ -75,9 +75,17 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-button type="danger" :disabled="this.selItems.length==0" style="margin-top: 10px;width: 100px;" size="mini"
-                 @click="" v-if="this.categories.length>0">批量删除
-      </el-button>
+      <el-footer>
+          <el-row :gutter="2" >
+            <el-col :span="6">
+            <el-button type="danger" :disabled="this.selItems.length==0" style="margin-top: 10px;width: 100px;" size="mini"
+                 @click="deleteAll" v-if="this.tableData.length>0">批量删除
+            </el-button>
+            </el-col>
+          </el-row>
+      </el-footer>
+
+      
     </el-main>
 
 <!-- 新建员工弹框---start -->
@@ -312,7 +320,7 @@
                     <el-col :span="7">
                     <div class="grid-content bg-purple">
                        <el-form-item label=""  prop="gender">
-                           <el-radio v-model="formAdd.gender" :label="1">男</el-radio>
+                           <el-radio v-model="formAdd.gender" :label="1" >男</el-radio>
                            <el-radio v-model="formAdd.gender" :label="0">女</el-radio>
                        </el-form-item>
                     </div>
@@ -466,7 +474,7 @@
     methods: {
 
       searchClick(){
-        this.loadBlogs(1, 100);//临时不翻页的情况
+       this.loadBlogs(1, 100);//临时不翻页
       },
       //翻页相关  
       loadBlogs(page, count){
@@ -503,6 +511,7 @@
 
       refresh(){
         let _this = this;
+ 
         //页面加载查询所有员工
          this. axios({url:'/emp/all?page=1&count=100', method:"get"}) .then((resp)=>{    
           _this.tableData = resp.data.list;
@@ -650,6 +659,25 @@
           }
         })
       },
+      //批量删除
+      deleteAll(){
+        var _this = this;
+        this.$confirm('确认删除这 ' + this.selItems.length + ' 条数据?', '提示', {
+          type: 'warning',
+          confirmButtonText: '确定',
+          cancelButtonText: '取消'
+        }).then(()=> {
+          var selItems = _this.selItems;
+          var ids = '';
+          for (var i = 0; i < selItems.length; i++) {
+            ids += selItems[i].id + ",";
+          }
+          _this.deleteCate(ids.substring(0, ids.length - 1));
+        }).catch(() => {
+          //取消
+          _this.loading = false;
+        });
+      },
     },
    
 
@@ -660,6 +688,10 @@
     
     data(){
       return {
+        totalCount: '',
+        currentPage01:1,
+        pageSize: 10,
+
         keywords: '',
         selItems: [],
         categories: [],

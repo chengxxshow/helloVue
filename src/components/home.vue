@@ -252,7 +252,7 @@ html,body{width: 100%;height: 100%; margin: 0;}
   }
   .myfooter{
     width: 100%;
-    position: fixed;
+    position: relative;
     bottom: 0;
   }
 
