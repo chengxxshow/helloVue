@@ -65,6 +65,25 @@ export default new Router({
     },
     {
       path: '/home',
+      name: '部门管理',
+      component: home,
+      iconCls: 'el-icon-star-on',
+      leaf: true,//只有一个节点
+      children: [
+        {
+          path: '/Dept',
+          name: '部门管理',
+          component: Dept,
+          iconCls: 'el-icon-star-on ',
+          meta: {
+            keepAlive: false,
+            isLogin: true
+          }
+        }
+      ]
+    },
+    {
+      path: '/home',
       name: '系统管理',
       component: home,
       iconCls: 'el-icon-setting',

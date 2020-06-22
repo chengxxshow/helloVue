@@ -82,6 +82,14 @@
                  @click="deleteAll" v-if="this.tableData.length>0">批量删除
             </el-button>
             </el-col>
+            <el-col :span="5">
+            <el-pagination
+              background
+              :page-size="pageSize" :current-page.sync="currentPage01"
+              layout="total, prev, pager, next"
+              :total="totalCount" @current-change="currentChange" v-show="this.tableData.length>0">
+            </el-pagination>
+            </el-col>
           </el-row>
       </el-footer>
 
@@ -290,7 +298,7 @@
                     <el-col :span="7">
                     <div class="grid-content bg-purple">
                        <el-form-item label="" prop="empno">
-                          <el-input v-model="formAdd.empno" placeholder="员工编号" size="mini"></el-input>
+                          <el-input v-model="formAdd.empno" readonly="readonly" placeholder="员工编号" size="mini"></el-input>
                        </el-form-item>
                     </div>
                     </el-col>
@@ -474,7 +482,14 @@
     methods: {
 
       searchClick(){
-       this.loadBlogs(1, 100);//临时不翻页
+      // this.loadBlogs(1, 100);//临时不翻页
+        this.loadBlogs(1, this.pageSize);
+      },
+      //翻页相关
+      currentChange(currentPage){
+        this.currentPage01 = currentPage;
+        this.loading = true;
+        this.loadBlogs(currentPage, this.pageSize);
       },
       //翻页相关  
       loadBlogs(page, count){
@@ -502,7 +517,7 @@
           _this.$message({type: 'error', message: '数据加载失败!'});
         })
 
-        //_this.loading = false;
+        _this.loading = false;
       },
       
       handleSelectionChange(val) {
@@ -511,11 +526,15 @@
 
       refresh(){
         let _this = this;
- 
+        
+        _this.searchClick(); 
+
         //页面加载查询所有员工
-         this. axios({url:'/emp/all?page=1&count=100', method:"get"}) .then((resp)=>{    
+         this. axios({url:'/emp/all', method:"get"}) .then((resp)=>{    
           _this.tableData = resp.data.list;
           _this.loading = false;
+          
+
         }, resp=> {
           if (resp.response.status == 403) {
             _this.$message({
@@ -688,9 +707,11 @@
     
     data(){
       return {
-        totalCount: '',
+      
+        totalCount: 0,
         currentPage01:1,
         pageSize: 10,
+       
 
         keywords: '',
         selItems: [],
@@ -734,6 +755,9 @@
           ename: [
             {required: true, message: "员工姓名不能为空", trigger: 'blur'},
             {min: 2, max: 50, message: "姓名3-50位中英文", pattern: /^[\u4E00-\u9FA5a-zA-Z]{2,50}$/,trigger: 'blur'}
+          ],
+          deptno: [
+            {required: true, message: "部门不能为空", trigger: 'blur'}
           ],
           status: [
             {required: true, message: "状态不能为空", trigger: 'blur'}
